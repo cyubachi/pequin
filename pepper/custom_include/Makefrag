@@ -1,0 +1,19 @@
+#
+# Makefile fragment for common code.
+# This is NOT a complete makefile;
+# you must run GNU make in the top-level directory
+# where the GNUmakefile is located.
+#
+
+OBJDIRS += custom_include 
+SRCDIR = . 
+
+
+CUSTOM_INCLUDE_SRCFILES := \
+  custom_include/custom_utility.cpp \
+  custom_include/logging_utility.cpp
+
+CUSTOM_INCLUDE_SRCFILES := $(wildcard $(CUSTOM_INCLUDE_SRCFILES))
+CUSTOM_INCLUDE_OBJFILES := $(patsubst %.cpp, $(OBJDIR)/%.o, $(CUSTOM_INCLUDE_SRCFILES))
+
+
