@@ -33,10 +33,10 @@ size_input(_size_input), size_output(_size_output), num_vars(_num_vars), num_con
     shared_bstore_file_name(string(_shared_bstore_file_name))
 {
 
-    init_block_store();
-    if (only_setup) {
-        return;
-    }
+    // init_block_store();
+    // if (only_setup) {
+    //     return;
+    // }
 
     size_f1_vec = num_vars;
     mpz_init_set(prime, _prime);

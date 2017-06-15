@@ -1,14 +1,15 @@
 CXX = g++
-CXXFLAGS = -m64 -std=c++11 -DCURVE_BN128 -DBN_SUPPORT_SNARK
+#CXXFLAGS = -m64 -std=c++11 -DCURVE_BN128 -DBN_SUPPORT_SNARK
+CXXFLAGS = -std=c++11 -DCURVE_ALT_BN128 -DBN_SUPPORT_SNARK -DMULTICORE -DUSE_DB_BLOCK_STORE
 
 AR	:= ar rcs
 
 DEPSDIR := $(HOME)/pepper_deps
 
-IFLAGS = -I./include -I. -I$(DEPSDIR)/include -I$(DEPSDIR)/include/libsnark
+IFLAGS = -I./include -I. -I$(DEPSDIR)/include -I$(DEPSDIR)/include/libsnark -I./custom_include
 IFLAGS += -I$(DEPSDIR)/include
 
-LDFLAGS = -L$(DEPSDIR)/lib -lsnark -lgmp -lgmpxx
+LDFLAGS = -L$(DEPSDIR)/lib -lsnark -lgmp -lgmpxx -fopenmp
 LDFLAGS += -lpapi -lrt -lleveldb -lkyotocabinet -Wl,-rpath,$(DEPSDIR)/lib/
 
 GENSRCDIR = gen
@@ -65,6 +66,7 @@ include common/Makefrag
 include storage/Makefrag
 include include/Makefrag
 include libv/Makefrag
+include custom_include/Makefrag
 
 COMMON_LIB_OBJFILES = \
 	$(COMMON_OBJFILES) \
@@ -72,7 +74,8 @@ COMMON_LIB_OBJFILES = \
 	$(MERKLE_OBJFILES) \
 	$(INCLUDE_OBJFILES) \
 	$(PROVER_OBJFILES) \
-	$(VERIFIER_OBJFILES)
+	$(VERIFIER_OBJFILES) \
+	$(CUSTOM_INCLUDE_OBJFILES)
 
 
 pepper_verifier_%: pepper_verifier.cpp objs common_defs.h $(BINDIR)/%.params

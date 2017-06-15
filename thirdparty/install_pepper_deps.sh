@@ -61,5 +61,5 @@ echo "installing libsnark"
 cd libsnark
 git checkout 746ade7ce0f30a6f6e612e50450294c8e7ade9a4
 ./prepare-depends.sh
-make install STATIC=1 NO_PROCPS=1 PREFIX=$DEPS_DIR
+make install CURVE=ALT_BN128 NO_DOCS=1 NO_SUPERCOP=1 STATIC=1 NO_PROCPS=1 PREFIX=$DEPS_DIR
 cd $UP
