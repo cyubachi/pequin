@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #VM arguments for java
-javaargs=-Xmx14000M
+#javaargs=-Xmx14000M
+javaargs=-Xmx512M
 #Arguments for python environment
 pythonargs=
 verbose=1
