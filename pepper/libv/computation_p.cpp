@@ -37,6 +37,8 @@ size_input(_size_input), size_output(_size_output), num_vars(_num_vars), num_con
     // if (only_setup) {
     //     return;
     // }
+    _blockStore = NULL;
+    _ram = NULL;
 
     size_f1_vec = num_vars;
     mpz_init_set(prime, _prime);
