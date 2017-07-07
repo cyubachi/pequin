@@ -18,6 +18,13 @@
 
 #include "common_defs.h"
 
+#include <sstream>
+
+#include "custom_include/custom_utility.h"
+#include "custom_include/logging_utility.h"
+
+#define RESTORE_VERIFY_FILE_NUM (17 + 3)
+
 #ifndef NAME
 #error "Must define NAME as name of computation."
 #endif
@@ -291,6 +298,39 @@ int main (int argc, char* argv[]) {
         std::string outputs_fn = std::string(shared_dir) + argv[4];
         std::string proof_fn = std::string(shared_dir) + argv[5];
         verify(verification_key_fn, inputs_fn, outputs_fn, proof_fn, p.n_inputs, p.n_outputs, prime);
+    }
+    else if(!strcmp(argv[1], "restore_verify_file") && argc == RESTORE_VERIFY_FILE_NUM) {
+        std::string input_fn = std::string(shared_dir) + NAME ".inputs";
+        std::string output_fn = std::string(shared_dir) + NAME ".outputs";
+        // 鍵の内容を読み込む
+        std::string previous_key_fn = std::string(shared_dir) + "/key";
+        std::string previous_key = read_file_to_string(previous_key_fn);
+        previous_key = trim(previous_key, " \t\v\r\n");
+
+
+        std::stringstream params;
+        std::vector<int> status_v;
+        for (int i = 2; i < argc; i++) {
+            params << argv[i] << std::endl;
+            status_v.push_back(atoi(argv[i]));
+        }
+        params << previous_key << std::endl;
+        unsigned char restore_key_hash[32];
+        sha256_hash_array(params.str(), restore_key_hash);
+
+        std::ofstream restore_inputs(input_fn);
+        std::ofstream restore_outputs(output_fn);
+        // pwsの先頭の多項式が空なので0がセットされるのは固定。
+        restore_outputs << std::to_string(0) << std::endl;
+        for (int i = 0; i < 32; i++) {
+            restore_inputs << std::to_string((int)restore_key_hash[i]) << std::endl;
+            restore_outputs << std::to_string((int)restore_key_hash[i]) << std::endl;
+        }
+        restore_inputs.close();
+        std::string next_key = get_current_key(status_v, previous_key);
+        restore_outputs.close();
+        write_current_key_file(previous_key_fn, next_key);
+        return 0;
     }
     else {
         print_usage(argv);
