@@ -32,12 +32,12 @@
 #error "Must define NAME as name of computation."
 #endif
 
-#define OBD_PARAM_NUM 3
+#define OBD_PARAM_NUM 17
 #define SETUP_PARAM_NUM 3
 #define CHECK_HASH_PARAM_NUM 3
 #define PROVER_PARAM_NUM 6
 // bin + OBD_PARAM_NUM + "restore_verify_file" + 1497430094(timestamp) + key
-#define RESTORE_VERIFY_FILE_NUM (OBD_PARAM_NUM + 3 + 1)
+#define RESTORE_VERIFY_FILE_NUM (OBD_PARAM_NUM + 3)
 #define TOTAL_PARAM_NUM (PROVER_PARAM_NUM + OBD_PARAM_NUM)
 
 void print_usage(char* argv[]) {
@@ -63,7 +63,11 @@ int main (int argc, char* argv[]) {
 //    std::string proof_fn = std::string(shared_dir) + argv[5];
     std::string proof_fn;
 
-    
+    // 鍵の内容を読み込む
+    std::string previous_key_fn = std::string(shared_dir) + "/key";
+    std::string previous_key = read_file_to_string(previous_key_fn);
+    previous_key = trim(previous_key, " \t\v\r\n");
+     
     bool only_setup = false;
     bool check_hash = false;
     if (!strcmp(argv[1], "setup")) {
@@ -80,10 +84,13 @@ int main (int argc, char* argv[]) {
         output_fn = std::string(shared_dir) + NAME ".outputs";
 
         std::stringstream params;
+        std::vector<int> status_v;
         for (int i = 2; i < argc; i++) {
             params << argv[i] << std::endl;
+            status_v.push_back(atoi(argv[i]));
         }
-        std::cout << params.str() << std::endl;
+        params << previous_key << std::endl;
+        // std::cout << params.str() << std::endl;
         unsigned char restore_key_hash[32];
         sha256_hash_array(params.str(), restore_key_hash);
         
@@ -96,7 +103,9 @@ int main (int argc, char* argv[]) {
             restore_outputs << std::to_string((int)restore_key_hash[i]) << std::endl;
         }
         restore_inputs.close();
+        std::string next_key = get_current_key(status_v, previous_key);
         restore_outputs.close();
+        write_current_key_file(previous_key_fn, next_key);
         return 0;
     }
 
@@ -131,12 +140,8 @@ int main (int argc, char* argv[]) {
     //std::string proof_fn = string(shared_dir) + argv[5];
     proof_fn = std::string(PROOF_FILE_PATH) + "/" +std::to_string((int)unix_time) + ".proof";
 
-    // 鍵の内容を読み込む
     // 鍵1
-    std::string previous_key_fn = std::string(shared_dir) + "/key";
-    std::string previous_key = read_file_to_string(previous_key_fn);
-    previous_key = trim(previous_key, " \t\v\r\n");
-    std::cout << "previous key: " + previous_key << std::endl;
+   std::cout << "previous key: " + previous_key << std::endl;
 
     
     // OBDから渡される値をvectorに入れていく
@@ -144,6 +149,7 @@ int main (int argc, char* argv[]) {
     engine_status_v.push_back((int)unix_time);
     for (int i = 6; i < argc; i++) {
         engine_status_v.push_back(std::stoi(argv[i]));
+        std::cout << argv[i] << std::endl;
     }
     append_log(engine_status_v);
 
