@@ -14,6 +14,6 @@ sh -c "bin/pepper_prover_logging restore_verify_file $restore_verify_files_arg"
 cp logs/proofs/${proof_file_name}.proof prover_verifier_shared/logging.proof
 
 # verifierを実行
-bin/pepper_verifier_logging verify logging.vkey logging.inputs logging.outputs  logging.proof > /dev/null 2>&1
+bin/pepper_verifier_logging verify logging.vkey logging.inputs logging.outputs logging.proof | tail -1 | grep SUCCESS > /dev/null 2>&1
 
 exit $?
