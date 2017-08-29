@@ -12,6 +12,9 @@ void write_current_key_file(std::string key_fn, std::string current_key);
 std::string get_current_key(std::vector<int> v, std::string previous_key);
 void get_current_key_array(std::vector<int> v, std::string previous_key, unsigned char *hash);
 void append_log(std::vector<int> v);
+int _exists(std::string path);
+void _mkdir(std::string path);
+void put_first_key(std::string dest_path, std::string car_id);
 
 #endif /* LOGGING_UTILITY_H */
 

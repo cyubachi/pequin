@@ -80,7 +80,7 @@ void append_log(std::vector<int> v) {
     log_file.close();
 }
 
-void _exists(std::string path) {
+int _exists(std::string path) {
     struct stat st;
     int ret = stat(path.c_str(), &st);
     return ret;
@@ -88,7 +88,7 @@ void _exists(std::string path) {
 
 void _mkdir(std::string path) {
     if (0 != _exists(path)) {
-        char cmd[PATH_MAX];
+        char cmd[1024];
         snprintf(cmd, sizeof(cmd), "mkdir -p %s", path.c_str());
         system(cmd);
     }
@@ -96,7 +96,7 @@ void _mkdir(std::string path) {
 
 void put_first_key(std::string dest_path, std::string car_id) {
     // first_keyで初期化する
-    char cmd[PATH_MAX];
+    char cmd[1024];
     std::string output_path = dest_path + "/" + car_id;
     _mkdir(output_path);
     snprintf(cmd, sizeof(cmd), "cp -i ~/pequin/pepper/first_key %s/key ", output_path.c_str());
