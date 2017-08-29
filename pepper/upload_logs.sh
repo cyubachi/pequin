@@ -2,12 +2,28 @@
 
 cd `dirname $0`
 
-scp -i ~/.ssh/obd.pem -r ec2-user@52.192.183.173:~/pequin/pepper/bin/arm_pepper_verifier_logging bin/pepper_verifier_logging
-scp -i ~/.ssh/obd.pem -r ec2-user@52.192.183.173:~/pequin/pepper/first_key prover_verifier_shared/key
-./restore_input_and_output_all.sh
 
-scp -i ~/.ssh/obd.pem  -r logs ec2-user@52.192.183.173:~/pequin/pepper
+SSH_LOGIN="ec2-user@52.192.183.173"
+#SSH_LOGIN="chubachi@172.10.2.150"
+KEY_OPTION=" -i ${HOME}/.ssh/obd.pem "
+#KEY_OPTION=
 
-rm -rf logs/inputs
-rm -rf logs/outputs
-rm bin/pepper_verifier_logging
+scp ${KEY_OPTION} -r logs/car_data.log ${SSH_LOGIN}:~/pequin/pepper/logs/tmp_append_car_data.log
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+ssh ${KEY_OPTION} ${SSH_LOGIN} "~/pequin/pepper/logs/cat_tmp_append_car_data.sh"
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+scp ${KEY_OPTION} -r logs/proofs/* ${SSH_LOGIN}:~/pequin/pepper/logs/proofs
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+
+rm -f logs/proofs/*
+rm -f logs/car_data.log
+touch logs/car_data.log
