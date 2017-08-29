@@ -305,7 +305,7 @@ int main (int argc, char* argv[]) {
         std::string car_id = std::string(argv[2]);
         // 鍵の内容を読み込む
         std::string previous_key_fn = std::string(shared_dir) + "/" + car_id + "/key";
-        if (_exists(previous_key_fn)) {
+        if (0 != _exists(previous_key_fn)) {
             put_first_key(std::string(shared_dir), car_id);
         }
 
