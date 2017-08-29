@@ -38,7 +38,6 @@
 #define CHECK_HASH_PARAM_NUM 3
 #define PROVER_PARAM_NUM 6
 // bin + OBD_PARAM_NUM + "restore_verify_file" + 1497430094(timestamp) + key
-#define RESTORE_VERIFY_FILE_NUM (OBD_PARAM_NUM + 3)
 #define TOTAL_PARAM_NUM (PROVER_PARAM_NUM + OBD_PARAM_NUM)
 
 void print_usage(char* argv[]) {
@@ -50,7 +49,7 @@ void print_usage(char* argv[]) {
 int main (int argc, char* argv[]) {
     
 //    if (argc != 2 && argc != 6 && argc != 9) {
-    if (argc != RESTORE_VERIFY_FILE_NUM && argc != SETUP_PARAM_NUM && argc != TOTAL_PARAM_NUM) {
+    if (argc != SETUP_PARAM_NUM && argc != TOTAL_PARAM_NUM) {
         print_usage(argv);
         exit(1);
     }
@@ -61,9 +60,10 @@ int main (int argc, char* argv[]) {
     std::string output_fn;
 //    std::string proof_fn = std::string(shared_dir) + argv[5];
     std::string proof_fn;
+    std::string car_id = argv[6];
 
     // 鍵の内容を読み込む
-    std::string previous_key_fn = std::string(shared_dir) + "/key";
+    std::string previous_key_fn = std::string(shared_dir) + "/" + car_id + "/key";
     std::string previous_key = read_file_to_string(previous_key_fn);
     previous_key = trim(previous_key, " \t\v\r\n");
      
@@ -77,35 +77,8 @@ int main (int argc, char* argv[]) {
         check_hash = true;
     }
 
-
-    if (!strcmp(argv[1], "restore_verify_file") && argc == RESTORE_VERIFY_FILE_NUM) {
-        input_fn = std::string(shared_dir) + NAME ".inputs";
-        output_fn = std::string(shared_dir) + NAME ".outputs";
-
-        std::stringstream params;
-        std::vector<int> status_v;
-        for (int i = 2; i < argc; i++) {
-            params << argv[i] << std::endl;
-            status_v.push_back(atoi(argv[i]));
-        }
-        params << previous_key << std::endl;
-        // std::cout << params.str() << std::endl;
-        unsigned char restore_key_hash[32];
-        sha256_hash_array(params.str(), restore_key_hash);
-        
-        std::ofstream restore_inputs(input_fn);
-        std::ofstream restore_outputs(output_fn);
-        // pwsの先頭の多項式が空なので0がセットされるのは固定。
-        restore_outputs << std::to_string(0) << std::endl;
-        for (int i = 0; i < 32; i++) {
-            restore_inputs << std::to_string((int)restore_key_hash[i]) << std::endl;
-            restore_outputs << std::to_string((int)restore_key_hash[i]) << std::endl;
-        }
-        restore_inputs.close();
-        std::string next_key = get_current_key(status_v, previous_key);
-        restore_outputs.close();
-        write_current_key_file(previous_key_fn, next_key);
-        return 0;
+    if (_exists(previous_key_fn)) {
+        put_first_key(std::string(shared_dir), car_id);
     }
 
     struct comp_params p = parse_params("./bin/" + std::string(NAME) + ".params");
@@ -136,21 +109,11 @@ int main (int argc, char* argv[]) {
     pk_filename = std::string(p_dir) + argv[2];
     input_fn = std::string(shared_dir) + argv[3];
     output_fn = std::string(shared_dir) + argv[4];
-    std::string car_id = argv[6];
     std::string proof_file_path = std::string(getenv("HOME")) + std::string(PROOF_FILE_PATH) + "/" + car_id;
     proof_fn = proof_file_path + "/" + argv[7] + ".proof";
 
     //std::string proof_fn = string(shared_dir) + argv[5];
-    struct stat st;
-    int ret = stat(proof_file_path.c_str(), &st);
-    if (0 != ret) {
-        std::cout << "path:" << proof_file_path << " does not exists." << std::endl;
-        char cmd[PATH_MAX];
-        snprintf(cmd, sizeof(cmd), "mkdir -p %s", proof_file_path.c_str());
-        system(cmd);
-    } else {
-        std::cout << "path:" << proof_file_path << " does exists." << std::endl;
-    }
+    _mkdir(proof_file_path);
 
     // 鍵1
     std::cout << "previous key: " + previous_key << std::endl;

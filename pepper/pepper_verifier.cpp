@@ -302,8 +302,13 @@ int main (int argc, char* argv[]) {
     else if(!strcmp(argv[1], "restore_verify_file") && argc == RESTORE_VERIFY_FILE_NUM) {
         std::string input_fn = std::string(shared_dir) + NAME ".inputs";
         std::string output_fn = std::string(shared_dir) + NAME ".outputs";
+        std::string car_id = std::string(argv[2]);
         // 鍵の内容を読み込む
-        std::string previous_key_fn = std::string(shared_dir) + "/key";
+        std::string previous_key_fn = std::string(shared_dir) + "/" + car_id + "/key";
+        if (_exists(previous_key_fn)) {
+            put_first_key(std::string(shared_dir), car_id);
+        }
+
         std::string previous_key = read_file_to_string(previous_key_fn);
         previous_key = trim(previous_key, " \t\v\r\n");
 
