@@ -23,7 +23,7 @@
 #include "custom_include/custom_utility.h"
 #include "custom_include/logging_utility.h"
 
-#define RESTORE_VERIFY_FILE_NUM (17 + 3)
+#define RESTORE_VERIFY_FILE_NUM (16 + 3)
 
 #ifndef NAME
 #error "Must define NAME as name of computation."
