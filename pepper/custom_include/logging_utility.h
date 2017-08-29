@@ -1,9 +1,8 @@
 #ifndef LOGGING_UTILITY_H
 #define LOGGING_UTILITY_H
 
-#define EMPTY_FILE_HASH "d0518e0c71e8205fd22dba57725c951e74318b3c869abb2399f74672adb77efe"
 //#define LOG_FILE_PATH "/home/pi/pequin-pepper/pequin-master/pepper/logs"
-#define LOG_FILE_PATH "/home/pi/pequin/pepper/logs"
+#define LOG_FILE_PATH "/pequin/pepper/logs"
 #define FULL_LOG_FILE_NAME LOG_FILE_PATH "/car_data.log"
 #define PROOF_FILE_PATH LOG_FILE_PATH "/proofs"
 

@@ -23,6 +23,7 @@
 #include <common/utility.h>
 #include <time.h>
 #include <sys/types.h> 
+#include <sys/stat.h>
 
 #include "custom_include/custom_utility.h"
 #include "custom_include/logging_utility.h"
@@ -54,8 +55,6 @@ int main (int argc, char* argv[]) {
         exit(1);
     }
     
-    time_t unix_time;
-    time(&unix_time);
     // 各種ファイル名の定義
     std::string pk_filename;
     std::string input_fn;
@@ -109,7 +108,7 @@ int main (int argc, char* argv[]) {
         return 0;
     }
 
-    struct comp_params p = parse_params("./bin/" + string(NAME) + ".params");
+    struct comp_params p = parse_params("./bin/" + std::string(NAME) + ".params");
     std::cout << "NUMBER OF CONSTRAINTS:  " << p.n_constraints << std::endl;
 
     mpz_t prime;
@@ -134,19 +133,31 @@ int main (int argc, char* argv[]) {
     //}        
 
     // 各種ファイル名の定義
-    pk_filename = string(p_dir) + argv[2];
-    input_fn = string(shared_dir) + argv[3];
-    output_fn = string(shared_dir) + argv[4];
+    pk_filename = std::string(p_dir) + argv[2];
+    input_fn = std::string(shared_dir) + argv[3];
+    output_fn = std::string(shared_dir) + argv[4];
+    std::string car_id = argv[6];
+    std::string proof_file_path = std::string(getenv("HOME")) + std::string(PROOF_FILE_PATH) + "/" + car_id;
+    proof_fn = proof_file_path + "/" + argv[7] + ".proof";
+
     //std::string proof_fn = string(shared_dir) + argv[5];
-    proof_fn = std::string(PROOF_FILE_PATH) + "/" +std::to_string((int)unix_time) + ".proof";
+    struct stat st;
+    int ret = stat(proof_file_path.c_str(), &st);
+    if (0 != ret) {
+        std::cout << "path:" << proof_file_path << " does not exists." << std::endl;
+        char cmd[PATH_MAX];
+        snprintf(cmd, sizeof(cmd), "mkdir -p %s", proof_file_path.c_str());
+        system(cmd);
+    } else {
+        std::cout << "path:" << proof_file_path << " does exists." << std::endl;
+    }
 
     // 鍵1
-   std::cout << "previous key: " + previous_key << std::endl;
+    std::cout << "previous key: " + previous_key << std::endl;
 
     
     // OBDから渡される値をvectorに入れていく
     std::vector<int> input_v, engine_status_v;
-    engine_status_v.push_back((int)unix_time);
     for (int i = 6; i < argc; i++) {
         engine_status_v.push_back(std::stoi(argv[i]));
         std::cout << argv[i] << std::endl;
@@ -213,21 +224,6 @@ int main (int argc, char* argv[]) {
     std::stringstream proof_str;
     proof_str << proof;
     
-//    std::cout << "**************** proof file name ****************" << std::endl;
-//    std::cout << proof_fn << std::endl;
-//    
-//    std::cout << "**************** proof file content ****************" << std::endl;
-//    std::cout << proof_str.str() << std::endl;
-//
-//    std::cout << "**************** output proof file content ****************" << std::endl;
-//    std::cout << proof_content << std::endl;
-//    
-//    std::cout << "**************** proof file sha 256 hash ****************" << std::endl;
-//    std::cout << sha256_str(proof_str.str()) << std::endl;
-//    
-//    std::cout << "**************** output proof file sha 256 hash ****************" << std::endl;
-//    std::cout << sha256_str(proof_content) << std::endl;
-
     std::ofstream output_file(output_fn);
     for (int i = 0; i < p.n_outputs; i++) {
         output_file << prover.input_output_q[p.n_inputs + i] << std::endl;
