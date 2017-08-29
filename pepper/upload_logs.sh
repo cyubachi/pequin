@@ -24,6 +24,6 @@ then
     exit 1
 fi
 
-rm -f logs/proofs/*
+rm -rf logs/proofs/*
 rm -f logs/car_data.log
 touch logs/car_data.log

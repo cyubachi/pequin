@@ -69,7 +69,7 @@ void get_current_key_array(std::vector<int> v, std::string previous_key, unsigne
 
 void append_log(std::vector<int> v) {
     std::ofstream log_file;
-    log_file.open(FULL_LOG_FILE_NAME, std::ios::app);
+    log_file.open(std::string(getenv("HOME")) + FULL_LOG_FILE_NAME, std::ios::app);
     for (int i = 0; i < v.size(); i++) {
         if (i > 0) {
             log_file << ",";
