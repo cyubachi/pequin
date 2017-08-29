@@ -64,8 +64,6 @@ int main (int argc, char* argv[]) {
 
     // 鍵の内容を読み込む
     std::string previous_key_fn = std::string(shared_dir) + "/" + car_id + "/key";
-    std::string previous_key = read_file_to_string(previous_key_fn);
-    previous_key = trim(previous_key, " \t\v\r\n");
      
     bool only_setup = false;
     bool check_hash = false;
@@ -80,6 +78,9 @@ int main (int argc, char* argv[]) {
     if (_exists(previous_key_fn)) {
         put_first_key(std::string(shared_dir), car_id);
     }
+
+    std::string previous_key = read_file_to_string(previous_key_fn);
+    previous_key = trim(previous_key, " \t\v\r\n");
 
     struct comp_params p = parse_params("./bin/" + std::string(NAME) + ".params");
     std::cout << "NUMBER OF CONSTRAINTS:  " << p.n_constraints << std::endl;
