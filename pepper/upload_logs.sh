@@ -33,3 +33,4 @@ then
 fi
 
 rm -rf logs/proofs/*
+rm -rf logs/car_data/*
